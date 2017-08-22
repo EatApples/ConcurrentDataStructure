@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.creditease.concurrent</groupId>
+	<artifactId>ConcurrentDataStructure</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jar.source>1.7</jar.source>
+		<jar.target>1.7</jar.target>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<outputDirectory>${project.build.directory}/lib</outputDirectory>
+					<includeScope>compile</includeScope>
+					<excludeTransitive>false</excludeTransitive>
+					<stripVersion>true</stripVersion>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${jar.source}</source>
+					<target>${jar.target}</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<!--2.5会有时间转换的问题 -->
+				<version>2.3.2</version>
+				<configuration>
+					<threshold>High</threshold>
+					<effort>Default</effort>
+					<findbugsXmlOutput>true</findbugsXmlOutput>
+					<findbugsXmlOutputDirectory>${basedir}/target</findbugsXmlOutputDirectory>
+					<excludeFilterFile>${basedir}/findbugs.exclude.xml</excludeFilterFile>
+					<!--<includeFilterFile>${basedir}\findbugs.include.xml</includeFilterFile> -->
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-source</id>
+						<phase>install</phase>
+						<!-- 要绑定到的生命周期的阶段 -->
+						<goals>
+							<goal>check</goal>
+							<!-- 要绑定的插件的目标 -->
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<attach>true</attach>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>
