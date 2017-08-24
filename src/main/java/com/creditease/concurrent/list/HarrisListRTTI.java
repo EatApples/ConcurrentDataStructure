@@ -166,8 +166,9 @@ public class HarrisListRTTI<E> implements Set<E> {
                 while (succ instanceof Marker) {
                     succ = succ.next;
                     // snip curr and marker
-                    if (!pred.casNext(curr, succ))
+                    if (!pred.casNext(curr, succ)) {
                         continue retry;
+                    }
                     curr = succ;
                     succ = curr.next;
                 }
@@ -215,8 +216,9 @@ public class HarrisListRTTI<E> implements Set<E> {
                 while (succ instanceof Marker) {
                     succ = succ.next;
                     // snip curr and marker
-                    if (!pred.casNext(curr, succ))
+                    if (!pred.casNext(curr, succ)) {
                         continue retry;
+                    }
                     curr = succ;
                     succ = curr.next;
                 }
