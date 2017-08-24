@@ -8,7 +8,7 @@ import junit.framework.*;
 public class MixedRTTITest extends TestCase {
 
     private final static int THREADS = 8;
-    private final static int TEST_SIZE = 512;
+    private final static int TEST_SIZE = 10240;
     private final static int PER_THREAD = TEST_SIZE / THREADS;
     MixedRTTI<Integer> instance;
     Thread[] thread = new Thread[THREADS];
@@ -183,80 +183,6 @@ public class MixedRTTITest extends TestCase {
             if (sb.length() > 0) {
                 fail(Thread.currentThread() + " not remove \n" + sb.toString());
             }
-        }
-    }
-
-    public void testMark() throws InterruptedException {
-
-        System.out.println("test mark");
-        for (int i = 1; i < THREADS * 10; i = i + 2) {
-            instance.add(i);
-        }
-
-        final CountDownLatch startGate = new CountDownLatch(1);
-        Thread[] myThreads = new Thread[2 * THREADS];
-        for (int i = 0; i < THREADS; i++) {
-            myThreads[i] = new InsertThread(i * 10 + 4, startGate);
-            myThreads[i + THREADS] = new DeleteThread(i * 10 + 5, startGate);
-        }
-        for (int i = 0; i < 2 * THREADS; i++) {
-            myThreads[i].start();
-        }
-        startGate.countDown();
-        for (int i = 0; i < 2 * THREADS; i++) {
-            myThreads[i].join();
-        }
-
-        System.out.println(instance.dump());
-    }
-
-    class InsertThread extends Thread {
-
-        int value;
-        CountDownLatch startGate;
-
-        InsertThread(int i, CountDownLatch startGate) {
-            value = i;
-            this.startGate = startGate;
-        }
-
-        public void run() {
-
-            try {
-                startGate.await();
-            }
-            catch (InterruptedException e) {
-
-                e.printStackTrace();
-            }
-
-            instance.add(value);
-
-        }
-    }
-
-    class DeleteThread extends Thread {
-
-        int value;
-        CountDownLatch startGate;
-
-        DeleteThread(int i, CountDownLatch startGate) {
-            value = i;
-            this.startGate = startGate;
-        }
-
-        public void run() {
-
-            try {
-                startGate.await();
-            }
-            catch (InterruptedException e) {
-
-                e.printStackTrace();
-            }
-
-            instance.remove(value);
-
         }
     }
 
