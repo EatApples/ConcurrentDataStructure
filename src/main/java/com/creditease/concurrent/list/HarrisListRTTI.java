@@ -37,10 +37,12 @@ public class HarrisListRTTI<E> implements Set<E> {
         volatile Node<E> next;
 
         Node(int k) {
+
             this.key = k;
         }
 
         Node(E item) {
+
             this.item = item;
             this.key = item.hashCode();
         }
@@ -73,6 +75,7 @@ public class HarrisListRTTI<E> implements Set<E> {
     private static final class Marker<E> extends Node<E> {
 
         private Marker(Node<E> n) {
+
             super(Integer.MIN_VALUE);
             this.next = n;
         }
@@ -86,6 +89,7 @@ public class HarrisListRTTI<E> implements Set<E> {
      * Constructor.
      */
     public HarrisListRTTI() {
+
         head = new Node<E>(Integer.MIN_VALUE);
         tail = new Node<E>(Integer.MAX_VALUE);
         head.next = tail;
@@ -276,20 +280,23 @@ public class HarrisListRTTI<E> implements Set<E> {
 
     }
 
-    public String dump() {
+    public int dump() {
 
         Node<E> curr = this.head;
-        StringBuilder sb = new StringBuilder();
+        int cnt = 0;
         while (curr != null) {
-            sb.append(curr.item);
+
             if (curr.next instanceof Marker) {
-                sb.append("X");
+
                 curr = curr.next;
             }
-            sb.append("->");
+            else {
+                cnt++;
+            }
+
             curr = curr.next;
         }
-        return sb.toString();
+        return cnt;
     }
 
 }

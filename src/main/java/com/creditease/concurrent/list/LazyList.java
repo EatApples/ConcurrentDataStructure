@@ -27,6 +27,7 @@ public class LazyList<E> implements Set<E> {
     private Node head;
 
     public LazyList() {
+
         // Add sentinels to start and end
         this.head = new Node(Integer.MIN_VALUE);
         this.head.next = new Node(Integer.MAX_VALUE);
@@ -282,6 +283,7 @@ public class LazyList<E> implements Set<E> {
          *            element in list
          */
         Node(E item) { // usual constructor
+
             this.item = item;
             this.key = item.hashCode();
             this.next = null;
@@ -296,6 +298,7 @@ public class LazyList<E> implements Set<E> {
          *            should be min or max int value
          */
         Node(int key) { // sentinel constructor
+
             this.item = null;
             this.key = key;
             this.next = null;
@@ -320,18 +323,18 @@ public class LazyList<E> implements Set<E> {
         }
     }
 
-    public String dump() {
+    public int dump() {
 
         Node curr = this.head;
-        StringBuilder sb = new StringBuilder();
+        int cnt = 0;
         while (curr != null) {
-            sb.append(curr.item);
-            if (curr.marked == true) {
-                sb.append("X");
+
+            if (curr.marked == false) {
+                cnt++;
             }
-            sb.append("->");
+
             curr = curr.next;
         }
-        return sb.toString();
+        return cnt;
     }
 }

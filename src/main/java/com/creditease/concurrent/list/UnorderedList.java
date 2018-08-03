@@ -31,7 +31,7 @@ public class UnorderedList<K, V> implements Map<K, V> {
     /**
      * Set node at head of the list.
      */
-    final void enlist(Entry<K, V> n) {
+    private final void enlist(Entry<K, V> n) {
 
         Entry<K, V> old = null;
         do {
@@ -49,7 +49,7 @@ public class UnorderedList<K, V> implements Map<K, V> {
      * @param value
      * @return
      */
-    final V helpInsert(Entry<K, V> home, K key, V value) {
+    private final V helpInsert(Entry<K, V> home, K key, V value) {
 
         Entry<K, V> pred = home;
         Entry<K, V> curr = pred.next;
@@ -84,7 +84,7 @@ public class UnorderedList<K, V> implements Map<K, V> {
     /**
      * The core remove protocol.
      */
-    final Entry<K, V> helpRemove(Entry<K, V> home, Object key) {
+    private final Entry<K, V> helpRemove(Entry<K, V> home, Object key) {
 
         Entry<K, V> pred = home;
         Entry<K, V> curr = pred.next;
@@ -131,6 +131,7 @@ public class UnorderedList<K, V> implements Map<K, V> {
      * Constructor.
      */
     public UnorderedList() {
+
         head = null;
     }
 
@@ -174,9 +175,9 @@ public class UnorderedList<K, V> implements Map<K, V> {
         /**
          * Creates new entry.
          */
-        Entry(K k, V v, Status s, Entry<K, V> n) {
+        Entry(K k, V v, Status s) {
+
             value = v;
-            next = n;
             key = k;
             status = s;
         }
@@ -347,7 +348,7 @@ public class UnorderedList<K, V> implements Map<K, V> {
             throw new NullPointerException();
 
         }
-        Entry<K, V> n = new Entry<K, V>(key, value, Status.INSERT, null);
+        Entry<K, V> n = new Entry<K, V>(key, value, Status.INSERT);
 
         enlist(n);
         V b = helpInsert(n, key, value);
@@ -367,7 +368,7 @@ public class UnorderedList<K, V> implements Map<K, V> {
 
         }
         @SuppressWarnings("unchecked")
-        Entry<K, V> n = new Entry<K, V>((K) key, null, Status.REMOVE, null);
+        Entry<K, V> n = new Entry<K, V>((K) key, null, Status.REMOVE);
         enlist(n);
         Entry<K, V> b = helpRemove(n, key);
         n.setStatus(Status.DEAD);
@@ -406,20 +407,21 @@ public class UnorderedList<K, V> implements Map<K, V> {
         throw new UnsupportedOperationException();
     }
 
-    public String dump() {
+    public int dump() {
 
         Entry<K, V> curr = this.head;
+        int cnt = 0;
 
-        StringBuilder sb = new StringBuilder();
         while (curr != null) {
 
-            sb.append(curr.toString());
-            sb.append("&" + curr.getStatus());
+            if (curr.getStatus() == Status.DATA || curr.getStatus() == Status.INSERT) {
+                cnt++;
+            }
             curr = curr.next;
-            sb.append("->");
 
         }
-        return sb.toString();
+
+        return cnt;
     }
 
 }

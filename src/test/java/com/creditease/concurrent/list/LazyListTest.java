@@ -8,7 +8,7 @@ import junit.framework.*;
 public class LazyListTest extends TestCase {
 
     private final static int THREADS = 8;
-    private final static int TEST_SIZE = 512;
+    private final static int TEST_SIZE = 10240;
     private final static int PER_THREAD = TEST_SIZE / THREADS;
     LazyList<Integer> instance;
     Thread[] thread = new Thread[THREADS];

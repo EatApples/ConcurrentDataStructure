@@ -2,25 +2,27 @@
 package com.creditease.concurrent.list;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import junit.framework.*;
 
-public class UnorderedListTest extends TestCase {
+public class UnorderedTest extends TestCase {
 
     private final static int THREADS = 8;
     private final static int TEST_SIZE = 10240;
     private final static int PER_THREAD = TEST_SIZE / THREADS;
-    UnorderedList<Integer, Integer> instance;
+    Unordered<Integer> instance;
     Thread[] thread = new Thread[THREADS];
 
-    public UnorderedListTest(String testName) {
+    public UnorderedTest(String testName) {
+
         super(testName);
-        instance = new UnorderedList<Integer, Integer>();
+        instance = new Unordered<Integer>();
     }
 
     public static Test suite() {
 
-        TestSuite suite = new TestSuite(UnorderedListTest.class);
+        TestSuite suite = new TestSuite(UnorderedTest.class);
 
         return suite;
     }
@@ -33,21 +35,17 @@ public class UnorderedListTest extends TestCase {
         System.out.println("sequential add, contains, and remove");
 
         for (int i = 0; i < TEST_SIZE; i++) {
-            instance.put(i, i);
+            instance.add(i);
         }
         for (int i = 0; i < TEST_SIZE; i++) {
-            if (!instance.containsKey(i)) {
-                fail("bad containsKey: " + i);
-            }
-            if (!instance.containsValue(i)) {
+
+            if (!instance.contains(i)) {
                 fail("bad containsValue: " + i);
             }
-            if (!instance.get(i).equals(i)) {
-                fail("bad get: " + i);
-            }
+
         }
         for (int i = 0; i < TEST_SIZE; i++) {
-            if (instance.remove(i) == null) {
+            if (!instance.remove(i)) {
                 fail("bad remove: " + i);
             }
         }
@@ -72,18 +70,14 @@ public class UnorderedListTest extends TestCase {
             thread[i].join();
         }
         for (int i = 0; i < TEST_SIZE; i++) {
-            if (!instance.containsKey(i)) {
-                fail("bad containsKey: " + i);
-            }
-            if (!instance.containsValue(i)) {
+
+            if (!instance.contains(i)) {
                 fail("bad containsValue: " + i);
             }
-            if (!instance.get(i).equals(i)) {
-                fail("bad get: " + i);
-            }
+
         }
         for (int i = 0; i < TEST_SIZE; i++) {
-            if (instance.remove(i) == null) {
+            if (!instance.remove(i)) {
                 fail("bad remove: " + i);
             }
         }
@@ -98,18 +92,14 @@ public class UnorderedListTest extends TestCase {
         System.out.println("parallel remove");
         final CountDownLatch startGate = new CountDownLatch(1);
         for (int i = 0; i < TEST_SIZE; i++) {
-            instance.put(i, i);
+            instance.add(i);
         }
         for (int i = 0; i < TEST_SIZE; i++) {
-            if (!instance.containsKey(i)) {
-                fail("bad containsKey: " + i);
-            }
-            if (!instance.containsValue(i)) {
+
+            if (!instance.contains(i)) {
                 fail("bad containsValue: " + i);
             }
-            if (!instance.get(i).equals(i)) {
-                fail("bad get: " + i);
-            }
+
         }
         for (int i = 0; i < THREADS; i++) {
             thread[i] = new RemoveThread(i * PER_THREAD, startGate);
@@ -144,28 +134,7 @@ public class UnorderedListTest extends TestCase {
             myThreads[i].join();
         }
         System.out.println(instance.dump());
-    }
-
-    public void testParallelPut() throws Exception {
-
-        System.out.println("parallel put");
-        for (int i = 0; i < TEST_SIZE; i++) {
-            instance.put(i, i);
-        }
-        final CountDownLatch startGate = new CountDownLatch(1);
-        Thread[] myThreads = new Thread[THREADS];
-        for (int i = 0; i < THREADS; i++) {
-            myThreads[i] = new putThread(i * PER_THREAD, startGate);
-
-        }
-        for (int i = 0; i < THREADS; i++) {
-            myThreads[i].start();
-        }
-        startGate.countDown();
-        for (int i = 0; i < THREADS; i++) {
-            myThreads[i].join();
-        }
-        System.out.println(instance.dump());
+        System.out.println("total:" + COUNT);
     }
 
     class AddThread extends Thread {
@@ -174,6 +143,7 @@ public class UnorderedListTest extends TestCase {
         CountDownLatch startGate;
 
         AddThread(int i, CountDownLatch startGate) {
+
             value = i;
             this.startGate = startGate;
         }
@@ -190,41 +160,13 @@ public class UnorderedListTest extends TestCase {
 
             for (int i = 0; i < PER_THREAD; i++) {
 
-                instance.put(value + i, value + i);
+                instance.add(value + i);
             }
 
         }
     }
 
-    private static final int BASE = 10000;
-
-    class putThread extends Thread {
-
-        int value;
-        CountDownLatch startGate;
-
-        putThread(int i, CountDownLatch startGate) {
-            value = i;
-            this.startGate = startGate;
-        }
-
-        public void run() {
-
-            try {
-                startGate.await();
-            }
-            catch (InterruptedException e) {
-
-                e.printStackTrace();
-            }
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < PER_THREAD; i++) {
-
-                sb.append(instance.put(value + i, value + i + BASE) + ",");
-            }
-            System.out.println(Thread.currentThread().getName() + "\n" + sb.toString());
-        }
-    }
+    final AtomicInteger COUNT = new AtomicInteger(0);
 
     class RemoveThread extends Thread {
 
@@ -232,6 +174,7 @@ public class UnorderedListTest extends TestCase {
         CountDownLatch startGate;
 
         RemoveThread(int i, CountDownLatch startGate) {
+
             value = i;
             this.startGate = startGate;
         }
@@ -245,15 +188,21 @@ public class UnorderedListTest extends TestCase {
 
                 e.printStackTrace();
             }
-            StringBuilder sb = new StringBuilder();
+            // StringBuilder sb = new StringBuilder();
+            int cnt = 0;
             for (int i = 0; i < PER_THREAD; i++) {
-                if (instance.remove(value + i) == null) {
-                    sb.append(value + i + "->");
-
+                if (!instance.remove(value + i)) {
+                    // sb.append(value + i + "->");
+                    cnt++;
                 }
             }
-            if (sb.length() > 0) {
-                fail(Thread.currentThread() + " not remove \n" + sb.toString());
+            // if (sb.length() > 0) {
+            // fail(Thread.currentThread() + " not remove \n" + sb.toString());
+            // }
+            if (cnt > 0) {
+                COUNT.getAndAdd(cnt);
+                fail(Thread.currentThread() + " not remove \n" + cnt);
+
             }
         }
     }
